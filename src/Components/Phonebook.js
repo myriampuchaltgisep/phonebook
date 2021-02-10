@@ -7,6 +7,7 @@ import {
   Spacer,
   NotesFilled,
   CallFilled,
+  ArchiveOutlined,
   Flex,
 } from '@aircall/tractor';
 import Accordion from 'react-bootstrap/Accordion';
@@ -130,6 +131,10 @@ const Phonebook = ({ calls }) => {
     }
   };
 
+  const archiveAll = () => {
+    calls.forEach((call) => archive(call.id));
+  };
+
   const addNote = async (id) => {
     await AxiosInstance.post(
       `/calls/${id}/note`,
@@ -168,6 +173,13 @@ const Phonebook = ({ calls }) => {
     <>
       <Flex size="300px" m="auto" display="inline-block">
         <Accordion>{listedCallsByDate()}</Accordion>
+        <Button
+          size="xSmall"
+          variant="destructive"
+          onClick={() => archiveAll()}
+        >
+          <ArchiveOutlined /> Archive all calls
+        </Button>
       </Flex>
     </>
   );
