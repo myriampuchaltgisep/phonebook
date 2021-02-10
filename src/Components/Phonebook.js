@@ -50,6 +50,13 @@ const Phonebook = ({ calls }) => {
       });
     };
 
+    let buttonText = 'Archive';
+    let buttonVariant = 'destructive';
+    if (call.is_archived) {
+      buttonText = 'Restore';
+      buttonVariant = 'warning';
+    }
+
     let notes = call.notes.map((note) => {
       return <p>{note.content}</p>;
     });
@@ -92,12 +99,35 @@ const Phonebook = ({ calls }) => {
                 >
                   Add Note
                 </Button>
+                <Button
+                  variant={buttonVariant}
+                  size="xSmall"
+                  onClick={() => archive(call.id)}
+                >
+                  {buttonText}
+                </Button>
               </Card.Body>
             </Accordion.Collapse>
           </Card>
         </Spacer>
       </>
     );
+  };
+
+  const archive = async (callId) => {
+    try {
+      await AxiosInstance.put(
+        `/calls/${callId}/archive`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${authContext.token}`,
+          },
+        },
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const addNote = async (id) => {
