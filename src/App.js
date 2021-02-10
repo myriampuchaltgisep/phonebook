@@ -5,6 +5,8 @@ import {
   Icon,
   VoicemailOutlined,
   Typography,
+  Button,
+  Flex,
 } from '@aircall/tractor';
 import Phonebook from './Components/Phonebook';
 import Authentication from './Components/Authentication';
@@ -16,6 +18,7 @@ import './App.css';
 function App() {
   const [calls, setCalls] = useState([]);
   const [page, setPage] = useState(0);
+  const [nextPage, setNextPage] = useState(true);
   const [authToken, setAuthToken] = useState(null);
 
   const authenticate = (token) => {
@@ -23,6 +26,14 @@ function App() {
   };
 
   const isAuthenticated = !!authToken;
+
+  const getPreviousCalls = () => {
+    setPage(page - 1);
+  };
+
+  const getNextCalls = () => {
+    setPage(page + 1);
+  };
 
   useEffect(() => {
     const getCalls = async () => {
@@ -36,6 +47,7 @@ function App() {
           },
         );
         setCalls(data.nodes);
+        setNextPage(data.hasNextPage);
       }
     };
 
@@ -67,6 +79,18 @@ function App() {
           {isAuthenticated ? (
             <>
               <Phonebook calls={calls}></Phonebook>
+              <Flex size="200px" m="auto" display="block">
+                <Button
+                  disabled={page === 0}
+                  onClick={() => getPreviousCalls()}
+                >
+                  PREV
+                </Button>
+                {/* <Typography variant="displayS">{page}</Typography> */}
+                <Button disabled={!nextPage} onClick={() => getNextCalls()}>
+                  NEXT
+                </Button>
+              </Flex>
             </>
           ) : (
             ''
