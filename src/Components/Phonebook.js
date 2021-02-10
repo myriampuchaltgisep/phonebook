@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import {
   Typography,
+  Button,
+  TextFieldInput,
   Spacer,
+  NotesFilled,
   CallFilled,
   Flex,
 } from '@aircall/tractor';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
+import AxiosInstance from '../helpers/axios';
+import { AuthContext } from '../contexts/AuthContext';
 
 const moment = require('moment');
 
@@ -15,6 +20,9 @@ const moment = require('moment');
 //   calls: Array<any>;
 // }
 const Phonebook = ({ calls }) => {
+  const [note, setNote] = useState({});
+  const authContext = useContext(AuthContext);
+
   const listedCallsByDate = () => {
     return Object.entries(groupCallsByDate()).map((entry) => {
       const date = entry[0];
@@ -36,6 +44,12 @@ const Phonebook = ({ calls }) => {
   };
 
   const renderCallAccordion = (call) => {
+    const handleInputChange = (event) => {
+      setNote({
+        [event.target.id]: event.target.value,
+      });
+    };
+
     let notes = call.notes.map((note) => {
       return <p>{note.content}</p>;
     });
@@ -63,12 +77,45 @@ const Phonebook = ({ calls }) => {
                 <p>
                   <strong>Notes:</strong> {notes}
                 </p>
+                <TextFieldInput
+                  id={call.id}
+                  placeholder="Add a Note"
+                  icon={NotesFilled}
+                  size="small"
+                  value={note[call.id]}
+                  onChange={handleInputChange}
+                />
+                <Button
+                  variant="instructive"
+                  size="xSmall"
+                  onClick={() => addNote(call.id)}
+                >
+                  Add Note
+                </Button>
               </Card.Body>
             </Accordion.Collapse>
           </Card>
         </Spacer>
       </>
     );
+  };
+
+  const addNote = async (id) => {
+    await AxiosInstance.post(
+      `/calls/${id}/note`,
+      {
+        content: note[id],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authContext.token}`,
+        },
+      },
+    ).then(() => {
+      setNote({
+        [id]: '',
+      });
+    });
   };
 
   const groupCallsByDate = () => {
