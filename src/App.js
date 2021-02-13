@@ -58,31 +58,31 @@ function App() {
 
   useEffect(() => {
     const subscribeToPusher = () => {
-      if (authToken) {
-        const pusher = new Pusher('d44e3d910d38a928e0be', {
-          cluster: 'eu',
-          // authEndpoint: 'http://localhost:5000/pusher/auth',
-          authEndpoint: 'https://frontend-test-api.aircall.io/pusher/auth',
-          auth: {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
+      const pusher = new Pusher('d44e3d910d38a928e0be', {
+        cluster: 'eu',
+        // authEndpoint: 'http://localhost:5000/pusher/auth',
+        authEndpoint: 'https://frontend-test-api.aircall.io/pusher/auth',
+        auth: {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
           },
-        });
+        },
+      });
 
-        // pusher.connection.bind('connected', () => console.log('connected'));
+      // pusher.connection.bind('connected', () => console.log('connected'));
 
-        let channel = pusher.subscribe('private-aircall');
+      let channel = pusher.subscribe('private-aircall');
 
-        // channel.bind('pusher:subscription_succeeded', () => {
-        //   console.log('subscription_succeeded');
-        // });
+      // channel.bind('pusher:subscription_succeeded', () => {
+      //   console.log('subscription_succeeded');
+      // });
 
-        channel.bind('pusher:subscription_error', (err) => {
-          console.log(err);
-        });
+      channel.bind('pusher:subscription_error', (err) => {
+        console.log(err);
+      });
 
-        channel.bind('update-call', (data) => {
+      channel.bind('update-call', (data) => {
+        if (calls.length > 0) {
           // 1. Make a shallow copy of the calls in the state
           let listOfCalls = [...calls];
           // 2. Find the Index of the call we want to update
@@ -93,12 +93,12 @@ function App() {
           listOfCalls[indexToUpdate] = data;
           // 4. Update the state with the updated call
           setCalls(listOfCalls);
-        });
-      }
+        }
+      });
     };
 
     subscribeToPusher();
-  }, [calls, authToken]);
+  }, [authToken, calls]);
 
   return (
     <AuthContext.Provider
@@ -110,17 +110,18 @@ function App() {
     >
       <Tractor injectStyle>
         <Container fluid className="App">
-          <header className="App-header">
-            <Typography variant="displayM">
-              <Icon
+            <div className="appHeader">
+            <Icon
                 component={VoicemailOutlined}
                 color="primary.base"
                 size={64}
                 marginRight={0}
               />
-              Phonebook
+            <Typography variant="displayM" >
+              <span className="appName">Phonebook</span>
             </Typography>
-          </header>
+            </div>
+            
           <Authentication />
           {isAuthenticated ? (
             <>
@@ -129,6 +130,7 @@ function App() {
                 <Button
                   disabled={page === 0}
                   onClick={() => getPreviousCalls()}
+                  className="button-margin"
                 >
                   PREV
                 </Button>

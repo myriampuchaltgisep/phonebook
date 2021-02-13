@@ -7,8 +7,9 @@ import {
   Spacer,
   NotesFilled,
   CallFilled,
-  ArchiveOutlined,
   Flex,
+  TrashOutlined,
+  CallbackOutlined
 } from '@aircall/tractor';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
@@ -51,11 +52,14 @@ const Phonebook = ({ calls }) => {
       });
     };
 
-    let buttonText = 'Archive';
+
+    let archiveButton = 'Archive';
     let buttonVariant = 'destructive';
+    let icon = <CallbackOutlined style={{ float: 'left' }} />;
     if (call.is_archived) {
-      buttonText = 'Restore';
+      archiveButton = 'Restore';
       buttonVariant = 'warning';
+      icon = <TrashOutlined style={{ float: 'right' }} />;
     }
 
     let notes = call.notes.map((note) => {
@@ -65,10 +69,10 @@ const Phonebook = ({ calls }) => {
     return (
       <>
         <Spacer fluid direction="vertical" space="m">
-          <Card>
+          <Card className="call-margin">
             <Accordion.Toggle as={Card.Header} eventKey={call.id}>
-              <CallFilled />
               {call.from}
+              {icon}
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={call.id}>
               <Card.Body>
@@ -97,6 +101,8 @@ const Phonebook = ({ calls }) => {
                   variant="instructive"
                   size="xSmall"
                   onClick={() => addNote(call.id)}
+                  mode="outline"
+                  className="button-margin"
                 >
                   Add Note
                 </Button>
@@ -104,8 +110,10 @@ const Phonebook = ({ calls }) => {
                   variant={buttonVariant}
                   size="xSmall"
                   onClick={() => archive(call.id)}
+                  mode="outline"
                 >
-                  {buttonText}
+                  {archiveButton}
+                  <TrashOutlined style={{ float: 'right' }} />
                 </Button>
               </Card.Body>
             </Accordion.Collapse>
@@ -132,7 +140,9 @@ const Phonebook = ({ calls }) => {
   };
 
   const archiveAll = () => {
-    calls.forEach((call) => archive(call.id));
+    // Make a shallow copy of the calls in the state to avoid an infinite loop of archives
+    const listOfCalls = [...calls];
+    listOfCalls.forEach((call) => archive(call.id));
   };
 
   const addNote = async (id) => {
@@ -177,8 +187,10 @@ const Phonebook = ({ calls }) => {
           size="xSmall"
           variant="destructive"
           onClick={() => archiveAll()}
+          mode="outline"
+          className="button-margin"
         >
-          <ArchiveOutlined /> Archive all calls
+          <TrashOutlined /> Archive all calls
         </Button>
       </Flex>
     </>

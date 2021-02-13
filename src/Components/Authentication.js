@@ -24,7 +24,11 @@ const Authentication = () => {
   return (
     <>
       {!authContext.isAuthenticated && (
-        <Button size="xSmall" onClick={() => getAuthToken()}>
+        <Button
+          size="xSmall"
+          onClick={() => getAuthToken()}
+          className="button-margin"
+        >
           <CallFilled />
           Get List of Calls
         </Button>
